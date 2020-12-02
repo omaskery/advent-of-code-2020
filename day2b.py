@@ -1,12 +1,11 @@
-from typing import List, Optional, Tuple
 from dataclasses import dataclass
 import re
 
 
 @dataclass
 class PasswordPolicy:
-    min_occurrences: int
-    max_occurrences: int
+    position_a: int
+    position_b: int
     letter: str
 
 
@@ -18,7 +17,7 @@ class PasswordEntry:
 
 # this is a regular expression, it is designed to match specific patterns of text (the lines of text in the input file)
 # it splits the line up into the individual pieces described in the puzzle
-PASSWORD_ENTRY_REGEX = re.compile(r'^\s*(?P<min>\d+)-(?P<max>\d+)\s+(?P<letter>[a-zA-Z])\s*:\s*(?P<password>.+)\s*$')
+PASSWORD_ENTRY_REGEX = re.compile(r'^\s*(?P<a>\d+)-(?P<b>\d+)\s+(?P<letter>[a-zA-Z])\s*:\s*(?P<password>.+)\s*$')
 
 
 def build_password_entry_from_line(line: str) -> PasswordEntry:
@@ -30,8 +29,8 @@ def build_password_entry_from_line(line: str) -> PasswordEntry:
     # now it's matched, we can store the individual values into our password entry
     return PasswordEntry(
         policy=PasswordPolicy(
-            min_occurrences=int(match.group('min')),
-            max_occurrences=int(match.group('max')),
+            position_a=int(match.group('a')),
+            position_b=int(match.group('b')),
             letter=match.group('letter'),
         ),
         password=match.group('password'),
@@ -39,10 +38,18 @@ def build_password_entry_from_line(line: str) -> PasswordEntry:
 
 
 def does_password_satisfy_policy(password: str, policy: PasswordPolicy) -> bool:
-    # count the number of letters in the password that match the policy
-    occurrences = len([letter for letter in password if letter == policy.letter])
-    # return whether the number of occurrences is within the limits specified in the policy
-    return policy.min_occurrences <= occurrences <= policy.max_occurrences
+    matching_letter_positions = [
+        # keep the indexes (1 indexed)
+        index + 1
+        # of every letter in the password
+        for index, letter in enumerate(password)
+        # where the index is one of the ones specified in the policy
+        # AND the letter in that position matches the letter specified in the policy
+        if (index + 1) in (policy.position_a, policy.position_b) and letter == policy.letter
+    ]
+
+    # the rules say that EXACTLY ONE of those positions can contain the letter
+    return len(matching_letter_positions) == 1
 
 
 def main():
