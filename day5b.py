@@ -77,9 +77,9 @@ def main():
     highest_seat_id = max(position.seat_id for position in seat_positions)
     print(f"highest seat ID: {highest_seat_id}!")
 
-    # calculate all possible seats, excluding the first and last row
+    # calculate all possible seats
     possible_seat_positions = []
-    for row in range(1, ROW_COUNT - 1):
+    for row in range(0, ROW_COUNT):
         for column in range(0, COLUMN_WIDTH):
             possible_seat_positions.append(SeatPosition(
                 row=row,
