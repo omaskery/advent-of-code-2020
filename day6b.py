@@ -26,22 +26,16 @@ class AnswerGroup:
 
         return answers
 
-    def questions_everyone_answered_yes_to(self) -> List[str]:
-        """list all the questions that all passengers answeres yes to"""
+    def questions_everyone_answered_yes_to(self) -> Set[str]:
+        """list all the questions that all passengers answered yes to"""
 
-        return [
-            # record the question
-            q
-            # for every question that we know someone in the group answeres yes to
-            for q in self.questions_answered_with_yes
-            # if that question was answeres yes by every passenger
-            if all(
-                # is this question answers yes by this passenger
-                q in p.questions_answered_with_yes
-                # for each passenger in this group
-                for p in self.passengers
-            )
-        ]
+        # start with a set of all questions anyone answered yes to
+        result = self.questions_answered_with_yes
+        # now remove all the questions somebody didn't say yes to
+        for p in self.passengers:
+            # a set intersect will only keep values that are in both sets
+            result.intersection_update(p.questions_answered_with_yes)
+        return result
 
 
 def load_answers_from_file(f: IO) -> List[AnswerGroup]:
