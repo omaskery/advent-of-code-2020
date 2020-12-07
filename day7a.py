@@ -1,6 +1,5 @@
+from typing import IO, Dict, Optional
 from dataclasses import dataclass
-from typing import Set, IO, List, Dict, Optional
-import string
 import re
 
 
@@ -60,7 +59,7 @@ def parse_bag_content_rule_file(f: IO) -> Dict[str, BagContentRule]:
     }
 
 
-def can_contain(rules: Dict[str, BagContentRule], outer_bag_colour: str, colour_of_bag_to_store: str) -> bool:
+def can_bag_contain(rules: Dict[str, BagContentRule], outer_bag_colour: str, colour_of_bag_to_store: str) -> bool:
     """determine whether, given a ruleset, a bag of a given colour can be stored in an outer bag of a given colour"""
 
     # try and get the rules associated with the outer bag
@@ -76,7 +75,7 @@ def can_contain(rules: Dict[str, BagContentRule], outer_bag_colour: str, colour_
     for bag_colour in rule_for_outer_bag.can_contain:
         # here we utilise recursion to test whether we can store the target bag in this inner bag, or any of
         # the bags that are inside that one! if any can, we're done, because we indirectly can store the bag!
-        if can_contain(rules, bag_colour, colour_of_bag_to_store):
+        if can_bag_contain(rules, bag_colour, colour_of_bag_to_store):
             return True
 
     # if we cannot store the bag directly, and if we can't store it indirectly inside one of our contained
@@ -100,7 +99,7 @@ def main():
         # for every bag colour described in the rules
         for bag_colour in bag_content_rules
         # if it could, directly or indirectly, contain our bag colour
-        if can_contain(bag_content_rules, bag_colour, our_bag_colour)
+        if can_bag_contain(bag_content_rules, bag_colour, our_bag_colour)
     ])
     print("there are {} bags that could, directly or indirectly, store our {} bag".format(
         how_many_can_store_our_bag,
