@@ -33,6 +33,10 @@ class CPU:
         # the computer has a program in memory, though it starts uninitialised
         self.program_memory: List[Instruction] = []
 
+    @property
+    def is_complete(self):
+        return self.instruction_pointer >= len(self.program_memory)
+
     def set_program_memory(self, program: List[Instruction]):
         """initialise the processor's program memory"""
 
@@ -41,7 +45,7 @@ class CPU:
     def execute_instruction(self):
         """executes a single instruction"""
 
-        if self.instruction_pointer >= len(self.instruction_pointer):
+        if self.is_complete:
             # when we run off the end of memory, halt
             return
 
@@ -111,7 +115,7 @@ def main():
     # keep track of which instructions we've executed
     instructions_executed = set()
     # keep running instructions, until you try to run one for a second time
-    while cpu.instruction_pointer not in instructions_executed:
+    while not cpu.is_complete and cpu.instruction_pointer not in instructions_executed:
         # record the instruction we're about to execute
         instructions_executed.add(cpu.instruction_pointer)
 
