@@ -41,9 +41,12 @@ class CPU:
     def execute_instruction(self):
         """executes a single instruction"""
 
-        # fetch the next instruction to execute, note that if you run off the end of the program you cycle
-        # around to the start
-        instruction = self.program_memory[self.instruction_pointer % len(self.program_memory)]
+        if self.instruction_pointer >= len(self.instruction_pointer):
+            # when we run off the end of memory, halt
+            return
+
+        # fetch the next instruction to execute
+        instruction = self.program_memory[self.instruction_pointer]
         # most instructions simply move onto the next instruction upon completion, so let's default to
         # considering the next instruction as the one we'll do next, individual operations can override this
         next_instruction_pointer = self.instruction_pointer + 1
